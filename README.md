@@ -4,7 +4,7 @@ This extension adds a tab for [facer](https://github.com/FacePerceiver/facer)
 
 
 
-<!-- ![facer tab screenshot](https://github.com/BbChip0103/sd-webui-facer/raw/main/images/prompt_tab.png) -->
+![facer tab screenshot](https://github.com/BbChip0103/sd-webui-facer/raw/main/images/facer_tab.png)
 
 
 ## Installing
