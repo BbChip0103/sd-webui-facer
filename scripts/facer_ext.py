@@ -61,7 +61,6 @@ def single_tab():
         with gr.Row():
             with gr.Column():
                 image = gr.Image(type='pil', label="Image")
-            with gr.Column():
                 mask = gr.Image(type='pil', label="Mask")
         mode = gr.Radio(['hair', 'face', 'neck', 'clothes'], label='Mode', value='best')
         seg_model = gr.Dropdown(get_modelnames('segmentation'), value='farl/lapa/448', label='Segmentation model')
