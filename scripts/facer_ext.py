@@ -17,10 +17,19 @@ from modules import devices, lowvram, script_callbacks, shared
 # from pydantic import BaseModel, Field
 
 
+def get_modelname_list(type_=='detection'):
+    if type_.lower()=='detection':
+        return ['retinaface/resnet50', 'retinaface/mobilenet']
+    elif type_.lower()=='segmentation':
+        return ['farl/lapa/448', 'farl/celebm/448']
+    else:
+        return []
+
+
 def mount_facer_api(_: gr.Blocks, app: FastAPI):
     @app.get("/facer/models")
-    async def get_models():
-        return ['farl/lapa/448', 'farl/celebm/448']
+    async def get_models(type_):
+        return get_modelname_list(type_)
 
 
 def add_tab():
