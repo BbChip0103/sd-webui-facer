@@ -1,10 +1,10 @@
-# facer extension for Stable Diffusion WebUI
+# Facer extension for Stable Diffusion WebUI
 
 This extension adds a tab for [facer](https://github.com/FacePerceiver/facer)
 
 
 
-<!-- ![facer tab screenshot](https://github.com/pharmapsychotic/clip-interrogator-ext/raw/main/images/prompt_tab.png) -->
+<!-- ![facer tab screenshot](https://github.com/BbChip0103/sd-webui-facer/raw/main/images/prompt_tab.png) -->
 
 
 ## Installing
@@ -18,11 +18,11 @@ This extension adds a tab for [facer](https://github.com/FacePerceiver/facer)
 
 <!-- ## API
 
-The CLIP Interrogator exposes a simple API to interact with the extension which is 
-documented on the /docs page under /interrogator/* (using --api flag when starting the Web UI)
-* /interrogator/models
-  * lists all available models for interrogation
-* /interrogator/prompt
-  * returns a prompt for the given image, model and mode
-* /interrogator/analyze
-  * returns a list of words and their scores for the given image, model -->
+The Facer exposes a simple API to interact with the extension which is 
+documented on the /docs page under /facer/* (using --api flag when starting the Web UI)
+* /facer/models
+  * lists all available models for facer
+* /facer/get-landmarks-mask
+  * returns a segmentation mask for the given image, model and mode
+* /facer/get-segmenattion-mask
+  * returns a segmentation mask for the given image, model and mode -->
