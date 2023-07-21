@@ -1,0 +1,12 @@
+numpy
+pyfacer
+pillow
+requests
+scipy
+opencv-python
+pandas
+scikit-image
+tqdm
+ipywidgets
+validators
+timm
