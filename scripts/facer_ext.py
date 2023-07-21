@@ -64,11 +64,11 @@ def single_tab():
             mask = gr.Image(type='pil', label="Mask")
             label_results = gr.Textbox(label="label results", lines=3)
     with gr.Row():
-        mode = gr.Radio(['hair', 'face', 'neck', 'clothes'], label='Mode', value='best')
+        mode = gr.Checkbox(['Hair', 'Face', 'Neck', 'Clothes'], label='Mode', value='best')
         seg_model = gr.Dropdown(get_modelnames('segmentation'), value='farl/lapa/448', label='Segmentation model')
     with gr.Row():
         button = gr.Button("Generate", variant='primary')
-        unload_button = gr.Button("Unload")
+        unload_button = gr.Button("Model unload")
     button.click(image_to_mask, inputs=[image, mode, seg_model], outputs=mask)
     unload_button.click(unload)
 
