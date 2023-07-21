@@ -26,6 +26,10 @@ def get_modelname_list(type_=='detection'):
         return []
 
 
+def image_to_mask(image, mode, seg_model):
+    return image
+
+
 def mount_facer_api(_: gr.Blocks, app: FastAPI):
     @app.get("/facer/models")
     async def get_models(type_):
@@ -54,13 +58,13 @@ def single_tab():
             image = gr.Image(type='pil', label="Image")
             with gr.Column():
                 mode = gr.Radio(['hair', 'face', 'neck', 'clothes'], label='Mode', value='best')
-                clip_model = gr.Dropdown(get_models(), value='farl/lapa/448', label='Segmentation model')
+                seg_model = gr.Dropdown(get_models(), value='farl/lapa/448', label='Segmentation model')
         mask = gr.Image(type='pil', label="Mask")
         prompt = gr.Textbox(label="Prompt", lines=3)
     with gr.Row():
         button = gr.Button("Generate", variant='primary')
         unload_button = gr.Button("Unload")
-    button.click(image_to_prompt, inputs=[image, mode, clip_model], outputs=mask)
+    button.click(image_to_mask, inputs=[image, mode, seg_model], outputs=mask)
     unload_button.click(unload)
 
 
