@@ -17,13 +17,17 @@ from modules import devices, lowvram, script_callbacks, shared
 # from pydantic import BaseModel, Field
 
 
-def get_modelname_list(type_=='detection'):
+def get_modelname_list(type_='detection'):
     if type_.lower()=='detection':
         return ['retinaface/resnet50', 'retinaface/mobilenet']
     elif type_.lower()=='segmentation':
         return ['farl/lapa/448', 'farl/celebm/448']
     else:
         return []
+
+
+def unload():
+    return True
 
 
 def image_to_mask(image, mode, seg_model):
