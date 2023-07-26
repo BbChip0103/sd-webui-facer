@@ -131,7 +131,7 @@ def image_to_mask(image, included_parts, excluded_parts):
     included_masks = []
     excluded_masks = []
     with torch.inference_mode():
-        faces = face_detector(image)
+        faces = det_model(image)
 
         target_parts = [
             each_part for each_part in ['Hair', 'Face']
