@@ -189,7 +189,7 @@ def single_tab():
         button = gr.Button("Generate", variant='primary')
         unload_button = gr.Button("Model unload")
     button.click(image_to_mask, inputs=[image, included_parts, excluded_parts], outputs=mask)
-    unload_button.click(unload)
+    unload_button.click(unload_model)
 
 
 script_callbacks.on_app_started(mount_facer_api)
