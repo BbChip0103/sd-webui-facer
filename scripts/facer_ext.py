@@ -189,9 +189,9 @@ def add_tab():
 def single_tab():
     with gr.Row():
         with gr.Column():
-            image = gr.Image(type='pil', label="Image")
+            image = gr.Image(type='numpy', label="Image")
         with gr.Column():
-            mask = gr.Image(type='pil', label="Mask")
+            mask = gr.Image(type='numpy', label="Mask")
             label_results = gr.Textbox(label="label results", lines=3)
     with gr.Row():
         included_parts = gr.CheckboxGroup(['Hair', 'Face', 'Neck', 'Clothes'], label="Included parts")
