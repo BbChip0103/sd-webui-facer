@@ -183,8 +183,8 @@ def single_tab():
             mask = gr.Image(type='pil', label="Mask")
             label_results = gr.Textbox(label="label results", lines=3)
     with gr.Row():
-        included_parts = gr.Checkbox(['Hair', 'Ear', 'Face', 'Neck', 'Clothes'], label='Included parts')
-        excluded_parts = gr.Checkbox(['Hair', 'Ear', 'Face', 'Neck', 'Clothes'], label='Excluded parts')
+        included_parts = gr.CheckboxGroup(['Hair', 'Face', 'Neck', 'Clothes'], label="Included parts")
+        excluded_parts = gr.CheckboxGroup(['Hair', 'Face', 'Neck', 'Clothes'], label='Excluded parts')
     with gr.Row():
         button = gr.Button("Generate", variant='primary')
         unload_button = gr.Button("Model unload")
