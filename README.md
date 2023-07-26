@@ -11,7 +11,7 @@ This extension adds a tab for [facer](https://github.com/FacePerceiver/facer)
 
 * Go to extensions tab
 * Click "Install from URL" sub tab
-* Paste `https://github.com/bbchip13/???` and click Install
+* Paste `https://github.com/BbChip0103/sd-webui-facer.git` and click Install
 * Check in your terminal window if there are any errors (if so let me know!)
 * Restart the Web UI and you should see a new **Interrogator** tab
 
