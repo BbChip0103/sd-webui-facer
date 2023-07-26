@@ -16,6 +16,10 @@ from modules import devices, lowvram, script_callbacks, shared
 
 # from pydantic import BaseModel, Field
 
+det_model = None
+seg_model = None
+seg_model_2 = None
+lndmrk_model = None
 
 def get_modelnames(type_='detection'):
     if type_.lower()=='detection':
@@ -51,22 +55,25 @@ def load_model(type_, model_name):
         if det_model is None:
             print(f"Loading face detection model {model_name}...")
             det_model = facer.face_detector(model_name, device=device)
-        return det_model
     elif type_.lower()=='segmentation':
-        global seg_model
-        if seg_model is None:
+        if 'lapa' in model_name:
             print(f"Loading face segmentation model {model_name}...")
+            global seg_model
             seg_model = facer.face_parser(model_name, device=device)
-        return seg_model
+        elif 'celebm' in model_name:
+            print(f"Loading face segmentation model {model_name}...")
+            global seg_model_2
+            seg_model_2 = facer.face_parser(model_name, device=device)
+        else:
+            pass
+
     elif type_.lower()=='landmark':
         global lndmrk_model
         if lndmrk_model is None:
             print(f"Loading face landmark detection model {model_name}...")
             face_aligner = facer.face_aligner(model_name, device=device)
-        return face_aligner
     else:
         print(f"Unknown model type...")
-        return None
 
 
 def unload_model(type_):
@@ -104,18 +111,22 @@ def extract_valid_seg_masks(faces, target_parts):
 
 def image_to_mask(image, included_parts, excluded_parts):
     if included_parts:
-        det_model = load_model('detection', 'retinaface/resnet50')
+        global det_model
+        load_model('detection', 'retinaface/resnet50')
     else:
         return np.zeros_like(image)
     
     if any([each_part in included_parts or each_part in excluded_parts for each_part in ['Hair', 'Face']]):
-        seg_model = load_model('segmentation', 'farl/lapa/448')
+        global seg_model
+        load_model('segmentation', 'farl/lapa/448')
 
     if any([each_part in included_parts or each_part in excluded_parts for each_part in ['Neck', 'Clothes']]):
-        seg_model_2 = load_model('segmentation', 'farl/celebm/448')
+        global seg_model_2
+        load_model('segmentation', 'farl/celebm/448')
 
     if any([each_part in included_parts or each_part in excluded_parts for each_part in ['Face']]):
-        lndmrk_model = load_model('landmark', 'farl/celebm/448')
+        global lndmrk_model
+        load_model('landmark', 'farl/celebm/448')
 
     included_masks = []
     excluded_masks = []
