@@ -113,10 +113,6 @@ def image_to_mask(image, included_parts, excluded_parts):
     else:
         return np.zeros_like(image)
 
-    print('shape:', image.shape)
-    print('dtype:', image.dtype)
-    print('min max:', image.min(), image.max())
-
     if any([each_part in included_parts or each_part in excluded_parts for each_part in ['Hair', 'Face']]):
         global seg_model
         load_model('segmentation', 'farl/lapa/448')
@@ -170,7 +166,8 @@ def image_to_mask(image, included_parts, excluded_parts):
         ### TODO: Implement excluded_mask
         merged_excluded_mask = merged_included_mask
 
-        merged_included_mask = original_input_image
+        merged_included_mask = merged_included_mask.astype(np.uint8)
+        merged_included_mask *= 255
 
     return merged_included_mask
 
