@@ -13,6 +13,7 @@ So I re-implement face_aligner function.
 import torch
 import facer
 import os
+from typing import Optional
 
 
 def face_aligner(name: str, device: torch.device, **kwargs) -> facer.FaceAlignment:
