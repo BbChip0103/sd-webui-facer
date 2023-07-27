@@ -19,7 +19,7 @@ from modules import devices, lowvram, script_callbacks, shared
 det_model = None
 seg_model = None
 seg_model_2 = None
-lndmrk_model = None
+lndmrk_model = facer.face_aligner('farl/ibug300w/448', device='cuda')
 
 def get_modelnames(type_='detection'):
     if type_.lower()=='detection':
