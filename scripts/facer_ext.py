@@ -5,6 +5,9 @@ import facer
 import cv2
 from PIL import Image
 import torch
+import io
+
+from _face_landmark_detector import face_aligner
 
 import csv
 import gradio as gr
@@ -19,56 +22,7 @@ from modules import devices, lowvram, script_callbacks, shared
 det_model = None
 seg_model = None
 seg_model_2 = None
-# lndmrk_model = facer.face_aligner('farl/ibug300w/448', device='cpu')
-
-
-
-# def load_face_alignment_model(model_path: str, num_classes=68):
-#     backbone = FaRLVisualFeatures("base", None, forced_input_resolution=448, output_indices=None).cpu()
-#     if "jit" in model_path:
-#         extra_files = {"backbone": None}
-#         heatmap_head = download_jit(model_path, map_location="cpu", _extra_files=extra_files)
-#         backbone_weight_io = io.BytesIO(extra_files["backbone"])
-#         backbone.load_state_dict(torch.load(backbone_weight_io))
-#         # print("load from jit")
-#     else:
-#         channels = backbone.get_output_channel("base")
-#         in_channels = [channels] * 4
-#         num_classes = num_classes
-#         heatmap_head = MMSEG_UPerHead(in_channels=in_channels, channels=channels, num_classes=num_classes) # this requires mmseg as a dependency
-#         state = torch.load(model_path,map_location="cpu")["networks"]["main_ema"]
-#         # print("load from checkpoint")
-
-#     main_network = FaceAlignmentTransformer(backbone, heatmap_head, heatmap_act="sigmoid").cpu()
-
-#     if "jit" not in model_path:
-#         main_network.load_state_dict(state, strict=True)
-
-#     return main_network
-
-import io
-backbone = facer.face_alignment.farl.FaRLVisualFeatures("base", None, forced_input_resolution=448, output_indices=None).cpu()
-
-model_path = '/home/lww/sharedfolder/facer/samples/face_alignment.farl.ibug300w.main_ema_jit.pt'
-extra_files = {"backbone": None}
-# heatmap_head = facer.util.download_jit(model_url, map_location="cpu", _extra_files=extra_files)
-heatmap_head = torch.jit.load(model_path, map_location='cpu', _extra_files=extra_files)
-
-# backbone_weight_io = io.BytesIO(extra_files["backbone"])
-with open('temp.tmp', 'wb') as f:
-    f.write(extra_files["backbone"])
-    
-state_dict = torch.load('temp.tmp')
-# state_dict = torch.load(backbone_weight_io)
-backbone.load_state_dict(state_dict)
-
-lndmrk_model = facer.face_alignment.farl.FaceAlignmentTransformer(backbone, heatmap_head, heatmap_act="sigmoid").cpu()
-
-
-# lndmrk_model = facer.face_alignment.farl.load_face_alignment_model(model_path=model_path, num_classes=68)
-
-
-
+lndmrk_model = face_aligner('farl/ibug300w/448', device='cuda')
 
 
 def get_modelnames(type_='detection'):

@@ -4,8 +4,8 @@ needs_install = False
 
 try:
     import facer
-    if facer.torch:
-        needs_install = True
+    if facer.torch.__version__:
+        needs_install = False
 except ImportError:
     needs_install = True
 
