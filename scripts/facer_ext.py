@@ -46,8 +46,18 @@ seg_model_2 = None
 
 #     return main_network
 
+from facer.face_alignment.farl import FaRLVisualFeatures
+
 model_path = '/home/lww/sharedfolder/facer/samples/face_alignment.farl.ibug300w.main_ema_jit.pt'
-lndmrk_model = facer.face_alignment.farl.load_face_alignment_model(model_path=model_path, num_classes=68)
+backbone = FaRLVisualFeatures("base", None, forced_input_resolution=448, output_indices=None).cpu()
+
+state_dict = torch.load(model_path)
+backbone.load_state_dict(
+    state_dict
+)
+
+
+# lndmrk_model = facer.face_alignment.farl.load_face_alignment_model(model_path=model_path, num_classes=68)
 
 
 
