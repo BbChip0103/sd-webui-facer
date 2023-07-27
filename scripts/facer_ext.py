@@ -7,7 +7,7 @@ from PIL import Image
 import torch
 import io
 
-from _face_landmark_detector import face_aligner
+from .face_landmark_detector import face_aligner
 
 import csv
 import gradio as gr
