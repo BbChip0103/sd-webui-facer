@@ -69,7 +69,7 @@ def load_model(type_, model_name):
         global lndmrk_model
         if lndmrk_model is None:
             print(f"Loading face landmark detection model {model_name}...")
-            face_aligner = facer.face_aligner(model_name, device=device)
+            lndmrk_model = facer.face_aligner(model_name, device=device)
     else:
         print(f"Unknown model type...")
 
