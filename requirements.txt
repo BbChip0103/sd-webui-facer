@@ -10,3 +10,4 @@ tqdm
 ipywidgets
 validators
 timm
+torch==1.13.1
