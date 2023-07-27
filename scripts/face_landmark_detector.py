@@ -15,7 +15,7 @@ import facer
 import os
 
 
-def face_aligner(name: str, device: torch.device, **kwargs) -> FaceAlignment:
+def face_aligner(name: str, device: torch.device, **kwargs) -> facer.FaceAlignment:
     aligner_type, conf_name = facer._split_name(name)
     if aligner_type == 'farl':
         return FaRLFaceAlignment(conf_name, device=device, **kwargs).to(device)
