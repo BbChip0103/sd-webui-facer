@@ -124,7 +124,7 @@ def image_to_mask(image, included_parts, excluded_parts):
 
     if any([each_part in included_parts or each_part in excluded_parts for each_part in ['Face']]):
         global lndmrk_model
-        load_model('landmark', 'farl/ibug300w/448')
+        load_model('landmark', 'farl/wflw/448')
 
     included_masks = []
     excluded_masks = []
