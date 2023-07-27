@@ -28,7 +28,7 @@ def load_face_alignment_model(model_path: str, num_classes=68, model_temp_path='
     backbone = facer.face_alignment.farl.FaRLVisualFeatures("base", None, forced_input_resolution=448, output_indices=None).cpu()
     if "jit" in model_path:
         extra_files = {"backbone": None}
-        heatmap_head = download_jit(model_path, map_location="cpu", _extra_files=extra_files)
+        heatmap_head = facer.util.download_jit(model_path, map_location="cpu", _extra_files=extra_files)
 
         if not os.path.isfile(model_temp_path):
             os.makedirs(os.path.dirname(model_temp_path), exist_ok=True)
@@ -38,12 +38,7 @@ def load_face_alignment_model(model_path: str, num_classes=68, model_temp_path='
         backbone.load_state_dict(torch.load(model_temp_path))
         # print("load from jit")
     else:
-        channels = backbone.get_output_channel("base")
-        in_channels = [channels] * 4
-        num_classes = num_classes
-        heatmap_head = MMSEG_UPerHead(in_channels=in_channels, channels=channels, num_classes=num_classes) # this requires mmseg as a dependency
-        state = torch.load(model_path,map_location="cpu")["networks"]["main_ema"]
-        # print("load from checkpoint")
+        return facer.face_alignment.farl.load_face_alignment_model(model_path=model_path, num_classes=68)
 
     main_network = facer.face_alignment.farl.FaceAlignmentTransformer(backbone, heatmap_head, heatmap_act="sigmoid").cpu()
 
