@@ -96,14 +96,13 @@ def make_seg_masks_from_parts(faces, target_parts):
     seg_probs = seg_logits.softmax(dim=1)
     n_classes = seg_probs.size(1)
     vis_seg_probs = seg_probs.argmax(dim=1).int()
-    seg_idx_mask = vis_seg_probs.cpu().numpy().squeeze()[0]
+    seg_idx_mask = vis_seg_probs.cpu().numpy().squeeze()
     
     seg_mask_list = []
     for valid_idx in valid_idx_list:
         seg_mask = (seg_idx_mask == valid_idx)
         seg_mask = seg_mask[..., np.newaxis]
         seg_mask_list.append(seg_mask)
-        print(seg_mask.shape)
 
     return seg_mask_list
 
