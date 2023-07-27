@@ -16,8 +16,6 @@ from modules import devices, lowvram, script_callbacks, shared
 
 # from pydantic import BaseModel, Field
 
-device = None
-
 det_model = None
 seg_model = None
 seg_model_2 = None
@@ -45,16 +43,9 @@ def get_modelnames(type_='detection'):
 
 
 def load_model(type_, model_name):
-    if torch.cuda.is_available():
-        global device
-        if device is None:
-            device = devices.get_optimal_device()
-        vram_total_mb = torch.cuda.get_device_properties(device).total_memory / (1024**2)
-        vram_info = f"GPU VRAM: **{vram_total_mb:.2f}MB**"
-    else:
-        global device
-        if device is None:
-            device = 'cpu'
+    device = devices.get_optimal_device()
+    vram_total_mb = torch.cuda.get_device_properties(device).total_memory / (1024**2)
+    vram_info = f"GPU VRAM: **{vram_total_mb:.2f}MB**"
 
     if type_.lower()=='detection':
         global det_model
@@ -137,7 +128,8 @@ def image_to_mask(image, included_parts, excluded_parts):
     included_masks = []
     excluded_masks = []
     with torch.inference_mode():
-        global device
+        device = devices.get_optimal_device()
+        
         image = facer.hwc2bchw(
             torch.from_numpy(image)
         ).to(device=device)
@@ -182,15 +174,10 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
 
 
 def add_tab():
-    global low_vram
-    low_vram = shared.cmd_opts.lowvram or shared.cmd_opts.medvram
-    if not low_vram and torch.cuda.is_available():
-        global device
-        if device is None:
-            device = devices.get_optimal_device()
-        vram_total = torch.cuda.get_device_properties(device).total_memory
-        if vram_total <= 12*1024*1024*1024:
-            low_vram = True
+    device = devices.get_optimal_device()
+    vram_total = torch.cuda.get_device_properties(device).total_memory
+    if vram_total <= 12*1024*1024*1024:
+        low_vram = True
 
     with gr.Blocks(analytics_enabled=False) as ui:
         with gr.Tab("Single"):
