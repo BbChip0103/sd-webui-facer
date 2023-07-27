@@ -19,7 +19,39 @@ from modules import devices, lowvram, script_callbacks, shared
 det_model = None
 seg_model = None
 seg_model_2 = None
-lndmrk_model = facer.face_aligner('farl/ibug300w/448', device='cpu')
+# lndmrk_model = facer.face_aligner('farl/ibug300w/448', device='cpu')
+
+
+
+# def load_face_alignment_model(model_path: str, num_classes=68):
+#     backbone = FaRLVisualFeatures("base", None, forced_input_resolution=448, output_indices=None).cpu()
+#     if "jit" in model_path:
+#         extra_files = {"backbone": None}
+#         heatmap_head = download_jit(model_path, map_location="cpu", _extra_files=extra_files)
+#         backbone_weight_io = io.BytesIO(extra_files["backbone"])
+#         backbone.load_state_dict(torch.load(backbone_weight_io))
+#         # print("load from jit")
+#     else:
+#         channels = backbone.get_output_channel("base")
+#         in_channels = [channels] * 4
+#         num_classes = num_classes
+#         heatmap_head = MMSEG_UPerHead(in_channels=in_channels, channels=channels, num_classes=num_classes) # this requires mmseg as a dependency
+#         state = torch.load(model_path,map_location="cpu")["networks"]["main_ema"]
+#         # print("load from checkpoint")
+
+#     main_network = FaceAlignmentTransformer(backbone, heatmap_head, heatmap_act="sigmoid").cpu()
+
+#     if "jit" not in model_path:
+#         main_network.load_state_dict(state, strict=True)
+
+#     return main_network
+
+model_path = '/home/lww/sharedfolder/facer/samples/face_alignment.farl.ibug300w.main_ema_jit.pt'
+lndmrk_model = facer.face_alignment.farl.load_face_alignment_model(model_path=model_path, num_classes=68)
+
+
+
+
 
 def get_modelnames(type_='detection'):
     if type_.lower()=='detection':
