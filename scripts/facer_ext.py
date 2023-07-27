@@ -46,6 +46,7 @@ seg_model_2 = None
 
 #     return main_network
 
+import io
 backbone = facer.face_alignment.farl.FaRLVisualFeatures("base", None, forced_input_resolution=448, output_indices=None).cpu()
 
 model_path = '/home/lww/sharedfolder/facer/samples/face_alignment.farl.ibug300w.main_ema_jit.pt'
