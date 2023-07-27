@@ -85,10 +85,10 @@ seg_label_dict = {
     'Cloth': 'cloth',
 }
 
-def extract_valid_seg_masks(faces, target_parts):
+def make_seg_masks_from_parts(faces, target_parts):
     seg_label_names = faces['seg']['label_names']
     seg_label_idx_dict = {label:i for i, label in enumerate(seg_label_names)}
-    valid_label_list = [seg_label_dict.get(each_part, None) for each_part in included_parts]
+    valid_label_list = [seg_label_dict.get(each_part, None) for each_part in target_parts]
     valid_label_list = [label for label in valid_label_list if label is not None]
     valid_idx_list = [seg_label_idx_dict[label] for label in valid_label_list]
 
@@ -129,7 +129,7 @@ def image_to_mask(image, included_parts, excluded_parts):
     excluded_masks = []
     with torch.inference_mode():
         device = devices.get_optimal_device()
-        
+
         image = facer.hwc2bchw(
             torch.from_numpy(image)
         ).to(device=device)
@@ -142,7 +142,7 @@ def image_to_mask(image, included_parts, excluded_parts):
         ]
         if target_parts:
             faces = seg_model(image, faces)
-            seg_masks = extract_valid_seg_masks(faces, target_parts)
+            seg_masks = make_seg_masks_from_parts(faces, target_parts)
             included_masks.append(seg_masks)
         
         target_parts = [
@@ -151,7 +151,7 @@ def image_to_mask(image, included_parts, excluded_parts):
         ]
         if target_parts:
             faces = seg_model_2(image, faces)
-            seg_masks = extract_valid_seg_masks(faces, target_parts)
+            seg_masks = make_seg_masks_from_parts(faces, target_parts)
             included_masks.append(seg_masks)
 
 
