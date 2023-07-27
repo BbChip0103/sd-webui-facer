@@ -54,13 +54,15 @@ def load_model(type_, model_name):
             det_model = facer.face_detector(model_name, device=device)
     elif type_.lower()=='segmentation':
         if 'lapa' in model_name:
-            print(f"Loading face segmentation model {model_name}...")
             global seg_model
-            seg_model = facer.face_parser(model_name, device=device)
+            if seg_model is None:
+                print(f"Loading face segmentation model {model_name}...")
+                seg_model = facer.face_parser(model_name, device=device)
         elif 'celebm' in model_name:
-            print(f"Loading face segmentation model {model_name}...")
             global seg_model_2
-            seg_model_2 = facer.face_parser(model_name, device=device)
+            if seg_model_2 is None:
+                print(f"Loading face segmentation model {model_name}...")
+                seg_model_2 = facer.face_parser(model_name, device=device)
         else:
             pass
     elif type_.lower()=='landmark':
@@ -81,7 +83,7 @@ seg_label_dict = {
     'Face': 'face',
     'Hair': 'hair',
     'Neck': 'neck',
-    'Cloth': 'cloth',
+    'Clothes': 'cloth',
 }
 
 def make_seg_masks_from_parts(faces, target_parts):
