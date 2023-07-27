@@ -28,7 +28,7 @@ def load_face_alignment_model(model_path: str, num_classes=68, model_temp_path='
     backbone = facer.face_alignment.farl.FaRLVisualFeatures("base", None, forced_input_resolution=448, output_indices=None).cpu()
     if "jit" in model_path:
         extra_files = {"backbone": None}
-        heatmap_head = facer.util.download_jit(model_path, map_location="cpu", _extra_files=extra_files)
+        heatmap_head = facer.util.download_url_to_file(model_path, map_location="cpu", _extra_files=extra_files)
 
         if not os.path.isfile(model_temp_path):
             os.makedirs(os.path.dirname(model_temp_path), exist_ok=True)
