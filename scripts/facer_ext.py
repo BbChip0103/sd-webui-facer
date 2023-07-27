@@ -51,7 +51,8 @@ backbone = facer.face_alignment.farl.FaRLVisualFeatures("base", None, forced_inp
 
 model_path = '/home/lww/sharedfolder/facer/samples/face_alignment.farl.ibug300w.main_ema_jit.pt'
 extra_files = {"backbone": None}
-torch.jit.load(model_path, map_location='cpu', _extra_files=extra_files)
+# heatmap_head = facer.util.download_jit(model_url, map_location="cpu", _extra_files=extra_files)
+heatmap_head = torch.jit.load(model_path, map_location='cpu', _extra_files=extra_files)
 
 # backbone_weight_io = io.BytesIO(extra_files["backbone"])
 with open('temp.tmp', 'wb') as f:
