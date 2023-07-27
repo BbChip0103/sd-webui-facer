@@ -169,6 +169,11 @@ def image_to_mask(image, included_parts, excluded_parts):
         merged_included_mask = merged_included_mask.astype(np.uint8)
         merged_included_mask *= 255
 
+        merged_included_mask = np.tile(
+            merged_included_mask, 
+            reps=3
+        )
+
     return merged_included_mask
 
 
