@@ -53,9 +53,12 @@ model_path = '/home/lww/sharedfolder/facer/samples/face_alignment.farl.ibug300w.
 extra_files = {"backbone": None}
 torch.jit.load(model_path, map_location='cpu', _extra_files=extra_files)
 
-backbone_weight_io = io.BytesIO(extra_files["backbone"])
-
-state_dict = torch.load(backbone_weight_io)
+# backbone_weight_io = io.BytesIO(extra_files["backbone"])
+with open('temp.tmp', 'wb') as f:
+    f.write(extra_files["backbone"])
+    
+state_dict = torch.load('temp.tmp')
+# state_dict = torch.load(backbone_weight_io)
 backbone.load_state_dict(state_dict)
 
 lndmrk_model = facer.face_alignment.farl.FaceAlignmentTransformer(backbone, heatmap_head, heatmap_act="sigmoid").cpu()
