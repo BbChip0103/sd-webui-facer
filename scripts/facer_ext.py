@@ -111,7 +111,7 @@ def image_to_mask(image, included_parts, excluded_parts):
         global det_model
         load_model('detection', 'retinaface/resnet50')
     else:
-        return np.zeros_like(image)
+        return np.zeros_like(image), 'test'
 
     if any([each_part in included_parts or each_part in excluded_parts for each_part in ['Hair', 'Face']]):
         global seg_model
@@ -169,7 +169,7 @@ def image_to_mask(image, included_parts, excluded_parts):
         merged_included_mask = merged_included_mask.astype(np.uint8)
         merged_included_mask *= 255
 
-    return merged_included_mask
+    return merged_included_mask, 'test'
 
 
 def mount_facer_api(_: gr.Blocks, app: FastAPI):
@@ -204,7 +204,7 @@ def single_tab():
     with gr.Row():
         button = gr.Button("Generate", variant='primary')
         unload_button = gr.Button("Model unload")
-    button.click(image_to_mask, inputs=[image, included_parts, excluded_parts], outputs=mask)
+    button.click(image_to_mask, inputs=[image, included_parts, excluded_parts], outputs=[mask, label_results])
     unload_button.click(unload_model)
 
 
