@@ -164,6 +164,10 @@ def image_to_mask(image, included_parts, excluded_parts):
         ### TODO: Implement excluded_mask
         merged_excluded_mask = merged_included_mask
     
+        print('shape:', merged_included_mask.shape)
+        print('dtype:', merged_included_mask.dtype)
+        print('min max:', merged_included_mask.min(), merged_included_mask.max())
+
     return merged_included_mask, merged_excluded_mask
 
 
