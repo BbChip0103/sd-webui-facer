@@ -113,9 +113,9 @@ def image_to_mask(image, included_parts, excluded_parts):
     else:
         return np.zeros_like(image)
 
-    print('shape:', merged_included_mask.shape)
-    print('dtype:', merged_included_mask.dtype)
-    print('min max:', merged_included_mask.min(), merged_included_mask.max())
+    print('shape:', image.shape)
+    print('dtype:', image.dtype)
+    print('min max:', image.min(), image.max())
 
     if any([each_part in included_parts or each_part in excluded_parts for each_part in ['Hair', 'Face']]):
         global seg_model
