@@ -112,7 +112,11 @@ def image_to_mask(image, included_parts, excluded_parts):
         load_model('detection', 'retinaface/resnet50')
     else:
         return np.zeros_like(image)
-    
+
+    print('shape:', merged_included_mask.shape)
+    print('dtype:', merged_included_mask.dtype)
+    print('min max:', merged_included_mask.min(), merged_included_mask.max())
+
     if any([each_part in included_parts or each_part in excluded_parts for each_part in ['Hair', 'Face']]):
         global seg_model
         load_model('segmentation', 'farl/lapa/448')
@@ -129,6 +133,8 @@ def image_to_mask(image, included_parts, excluded_parts):
     excluded_masks = []
     with torch.inference_mode():
         device = devices.get_optimal_device()
+
+        original_input_image = image
 
         image = facer.hwc2bchw(
             torch.from_numpy(image)
@@ -163,12 +169,10 @@ def image_to_mask(image, included_parts, excluded_parts):
 
         ### TODO: Implement excluded_mask
         merged_excluded_mask = merged_included_mask
-    
-        print('shape:', merged_included_mask.shape)
-        print('dtype:', merged_included_mask.dtype)
-        print('min max:', merged_included_mask.min(), merged_included_mask.max())
 
-    return merged_included_mask, merged_excluded_mask
+        merged_included_mask = original_input_image
+
+    return merged_included_mask
 
 
 def mount_facer_api(_: gr.Blocks, app: FastAPI):
