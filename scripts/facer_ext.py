@@ -103,6 +103,7 @@ def make_seg_masks_from_parts(faces, target_parts):
         seg_mask = (seg_idx_mask == valid_idx)
         seg_mask = seg_mask[..., np.newaxis]
         seg_mask_list.append(seg_mask)
+        print(seg_mask.shape)
 
     return seg_mask_list
 
