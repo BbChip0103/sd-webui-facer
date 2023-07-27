@@ -47,12 +47,14 @@ def get_modelnames(type_='detection'):
 def load_model(type_, model_name):
     if torch.cuda.is_available():
         global device
-        device = devices.get_optimal_device()
+        if device is None:
+            device = devices.get_optimal_device()
         vram_total_mb = torch.cuda.get_device_properties(device).total_memory / (1024**2)
         vram_info = f"GPU VRAM: **{vram_total_mb:.2f}MB**"
     else:
         global device
-        device = 'cpu'
+        if device is None:
+            device = 'cpu'
 
     if type_.lower()=='detection':
         global det_model
@@ -183,7 +185,9 @@ def add_tab():
     global low_vram
     low_vram = shared.cmd_opts.lowvram or shared.cmd_opts.medvram
     if not low_vram and torch.cuda.is_available():
-        device = devices.get_optimal_device()
+        global device
+        if device is None:
+            device = devices.get_optimal_device()
         vram_total = torch.cuda.get_device_properties(device).total_memory
         if vram_total <= 12*1024*1024*1024:
             low_vram = True
