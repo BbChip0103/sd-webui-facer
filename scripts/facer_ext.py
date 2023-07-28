@@ -123,7 +123,7 @@ def make_lndmrk_masks_from_parts(faces, target_parts, dilation_size=0):
 
     return seg_mask_list
 
-def image_to_mask(image, included_parts, excluded_parts):
+def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentage=0):
     if included_parts:
         global det_model
         load_model('detection', 'retinaface/resnet50')
@@ -200,10 +200,16 @@ def image_to_mask(image, included_parts, excluded_parts):
         if target_included_parts + target_excluded_parts:
             faces = face_aligner(image, faces)
             if target_included_parts:
-                lndmrk_masks = make_lndmrk_masks_from_parts(faces, target_included_parts, dilation_size=0)
+                lndmrk_masks = make_lndmrk_masks_from_parts(
+                    faces, target_included_parts, 
+                    dilation_size=face_dilation_percentage
+                )
                 included_masks.append(lndmrk_masks)
             if target_excluded_parts:
-                lndmrk_masks = make_lndmrk_masks_from_parts(faces, target_excluded_parts, dilation_size=0)
+                lndmrk_masks = make_lndmrk_masks_from_parts(
+                    faces, target_excluded_parts, 
+                    dilation_size=face_dilation_percentage
+                )
                 excluded_masks.append(lndmrk_masks)
 
         merged_mask = None
@@ -271,10 +277,11 @@ def single_tab():
     with gr.Row():
         included_parts = gr.CheckboxGroup(['Hair', 'Face', 'Neck', 'Clothes'], label="Included parts")
         excluded_parts = gr.CheckboxGroup(['Hair', 'Face', 'Neck', 'Clothes'], label='Excluded parts')
+        face_dilation_percentage = gr.Slider(0, 100, value=0, label="Face dilation size (%)", info="If you check 'Face', you can choose dilation size")
     with gr.Row():
         button = gr.Button("Generate", variant='primary')
         unload_button = gr.Button("Model unload")
-    button.click(image_to_mask, inputs=[image, included_parts, excluded_parts], outputs=mask)
+    button.click(image_to_mask, inputs=[image, included_parts, excluded_parts, face_dilation_percentage], outputs=mask)
     unload_button.click(unload_model)
 
 
