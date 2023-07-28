@@ -67,7 +67,7 @@ class FaRLFaceAlignment(facer.face_alignment.farl.FaRLFaceAlignment):
 
     def __init__(self, conf_name: Optional[str] = None,
                  model_path: Optional[str] = None, device=None) -> None:
-        super().__init__()
+        super(facer.face_alignment.farl.FaRLFaceAlignment, self).__init__()
         if conf_name is None:
             conf_name = 'ibug300w/448'
         if model_path is None:
@@ -81,3 +81,4 @@ class FaRLFaceAlignment(facer.face_alignment.farl.FaRLFaceAlignment):
 
         self.heatmap_interpolate_mode = 'bilinear'
         self.eval()
+
