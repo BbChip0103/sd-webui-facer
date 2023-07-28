@@ -111,6 +111,18 @@ def make_seg_masks_from_parts(faces, target_parts):
 
     return seg_mask_list
 
+def make_lndmrk_masks_from_parts(faces, target_parts, dilation_size=0):
+    lndmark_result = faces['alignment'][0].cpu().numpy()
+    lndmrk_mask = np.zeros((image.shape[2], image.shape[3], 1))
+    hull = cv2.convexHull(lndmark_result).astype(np.int32)
+    lndmrk_mask = cv2.fillConvexPoly(lndmrk_mask, hull, 1)
+    lndmrk_mask = (lndmrk_mask==1)
+
+    seg_mask_list = []
+    seg_mask_list.append(lndmrk_mask)
+
+    return seg_mask_list
+
 def image_to_mask(image, included_parts, excluded_parts):
     if included_parts:
         global det_model
@@ -135,7 +147,7 @@ def image_to_mask(image, included_parts, excluded_parts):
     with torch.inference_mode():
         device = devices.get_optimal_device()
 
-        original_input_image = image
+        original_input_image = image.copy()
 
         image = facer.hwc2bchw(
             torch.from_numpy(image)
@@ -143,43 +155,91 @@ def image_to_mask(image, included_parts, excluded_parts):
 
         faces = det_model(image)
 
-        target_parts = [
+        target_included_parts = [
             each_part for each_part in ['Hair', 'Face']
                 if each_part in included_parts
         ]
-        if target_parts:
+        target_excluded_parts = [
+            each_part for each_part in ['Hair', 'Face']
+                if each_part in excluded_parts
+        ]
+        if target_included_parts + target_excluded_parts:
             faces = seg_model(image, faces)
-            seg_masks = make_seg_masks_from_parts(faces, target_parts)
-            included_masks.append(seg_masks)
+            if target_included_parts:
+                seg_masks = make_seg_masks_from_parts(faces, target_included_parts)
+                included_masks.append(seg_masks)
+            if target_excluded_parts:
+                seg_masks = make_seg_masks_from_parts(faces, target_excluded_parts)
+                excluded_masks.append(seg_masks)
         
-        target_parts = [
+        target_included_parts = [
             each_part for each_part in ['Neck', 'Clothes']
                 if each_part in included_parts
         ]
-        if target_parts:
+        target_excluded_parts = [
+            each_part for each_part in ['Neck', 'Clothes']
+                if each_part in excluded_parts
+        ]
+        if target_included_parts + target_excluded_parts:
             faces = seg_model_2(image, faces)
-            seg_masks = make_seg_masks_from_parts(faces, target_parts)
-            included_masks.append(seg_masks)
+            if target_included_parts:
+                seg_masks = make_seg_masks_from_parts(faces, target_included_parts)
+                included_masks.append(seg_masks)
+            if target_excluded_parts:
+                seg_masks = make_seg_masks_from_parts(faces, target_excluded_parts)
+                excluded_masks.append(seg_masks)
 
+        target_included_parts = [
+            each_part for each_part in ['Face']
+                if each_part in included_parts
+        ]
+        target_excluded_parts = [
+            each_part for each_part in ['Face']
+                if each_part in excluded_parts
+        ]
+        if target_included_parts + target_excluded_parts:
+            faces = face_aligner(image, faces)
+            if target_included_parts:
+                lndmrk_masks = make_lndmrk_masks_from_parts(faces, target_included_parts, dilation_size=0)
+                included_masks.append(lndmrk_masks)
+            if target_excluded_parts:
+                lndmrk_masks = make_lndmrk_masks_from_parts(faces, target_excluded_parts, dilation_size=0)
+                excluded_masks.append(lndmrk_masks)
 
-        included_masks = np.vstack(included_masks)
+        merged_mask = None
+        if included_masks and excluded_masks:
+            included_masks = np.vstack(included_masks)
+            excluded_masks = np.vstack(excluded_masks)
 
-        merged_included_mask = included_masks[0]
-        for each_mask in included_masks[1:]:
-            merged_included_mask = (merged_included_mask | each_mask)
+            merged_included_mask = included_masks[0]
+            for each_mask in included_masks[1:]:
+                merged_included_mask = (merged_included_mask | each_mask)
 
-        ### TODO: Implement excluded_mask
-        merged_excluded_mask = merged_included_mask
+            merged_excluded_mask = excluded_masks[0]
+            for each_mask in excluded_masks[1:]:
+                merged_excluded_mask = (merged_excluded_mask | each_mask)
 
-        merged_included_mask = merged_included_mask.astype(np.uint8)
-        merged_included_mask *= 255
+            merged_mask = (merged_included_mask & (~merged_excluded_mask))
 
-        merged_included_mask = np.tile(
-            merged_included_mask, 
-            reps=3
-        )
+        elif included_masks:
+            included_masks = np.vstack(included_masks)
 
-    return merged_included_mask
+            merged_included_mask = included_masks[0]
+            for each_mask in included_masks[1:]:
+                merged_included_mask = (merged_included_mask | each_mask)
+
+            merged_mask = merged_included_mask
+
+        if merged_mask:
+            merged_mask = merged_mask.astype(np.uint8)
+            merged_mask *= 255
+
+            merged_mask = np.tile(
+                merged_mask, 
+                reps=3
+            )
+
+    return merged_mask
 
 
 def mount_facer_api(_: gr.Blocks, app: FastAPI):
