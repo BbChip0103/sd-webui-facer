@@ -31,6 +31,7 @@ def load_face_alignment_model(model_path: str, num_classes=68, model_temp_path='
         heatmap_head = facer.util.download_jit(model_path, map_location="cpu", _extra_files=extra_files)
 
         if not os.path.isfile(model_temp_path):
+            print(f'{model_temp_path} will be saved and loaded.')
             os.makedirs(os.path.dirname(model_temp_path), exist_ok=True)
             with open(model_temp_path, 'wb') as f:
                 f.write(extra_files["backbone"])
@@ -48,7 +49,7 @@ def load_face_alignment_model(model_path: str, num_classes=68, model_temp_path='
     return main_network
 
 
-class FaRLFaceAlignment(facer.face_alignment.farl.FaceAlignment):
+class FaRLFaceAlignment(facer.face_alignment.farl.FaRLFaceAlignment):
     """ The face alignment models from [FaRL](https://github.com/FacePerceiver/FaRL).
 
     Please consider citing 
