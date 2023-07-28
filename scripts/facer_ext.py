@@ -230,7 +230,7 @@ def image_to_mask(image, included_parts, excluded_parts):
 
             merged_mask = merged_included_mask
 
-        if merged_mask:
+        if merged_mask is not None:
             merged_mask = merged_mask.astype(np.uint8)
             merged_mask *= 255
 
