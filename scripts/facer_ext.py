@@ -111,7 +111,7 @@ def make_seg_masks_from_parts(faces, target_parts):
 
     return seg_mask_list
 
-def make_lndmrk_masks_from_parts(faces, target_parts, dilation_size=0):
+def make_lndmrk_masks_from_parts(faces, target_parts, image, dilation_size=0):
     lndmark_result = faces['alignment'][0].cpu().numpy()
     lndmrk_mask = np.zeros((image.shape[2], image.shape[3], 1))
     hull = cv2.convexHull(lndmark_result).astype(np.int32)
@@ -201,13 +201,13 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
             faces = lndmrk_model(image, faces)
             if target_included_parts:
                 lndmrk_masks = make_lndmrk_masks_from_parts(
-                    faces, target_included_parts, 
+                    faces, target_included_parts, image, 
                     dilation_size=face_dilation_percentage
                 )
                 included_masks.append(lndmrk_masks)
             if target_excluded_parts:
                 lndmrk_masks = make_lndmrk_masks_from_parts(
-                    faces, target_excluded_parts, 
+                    faces, target_excluded_parts, image, 
                     dilation_size=face_dilation_percentage
                 )
                 excluded_masks.append(lndmrk_masks)
