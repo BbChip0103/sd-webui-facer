@@ -199,7 +199,7 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
         ]
         if target_included_parts + target_excluded_parts:
             print(type(image), type(faces))
-            faces = face_aligner(image, faces)
+            faces = lndmrk_model(image, faces)
             if target_included_parts:
                 lndmrk_masks = make_lndmrk_masks_from_parts(
                     faces, target_included_parts, 
