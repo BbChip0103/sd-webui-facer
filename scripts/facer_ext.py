@@ -125,11 +125,21 @@ def make_seg_masks_from_parts(faces, target_parts):
 
     return seg_mask_list
 
-def make_lndmrk_masks_from_parts(faces, target_parts, image, dilation_size=0):
+def make_lndmrk_masks_from_parts(faces, target_parts, image, dilation_percentage=0):
     lndmark_result = faces['alignment'][0].cpu().numpy()
     lndmrk_mask = np.zeros((image.shape[2], image.shape[3], 1))
     hull = cv2.convexHull(lndmark_result).astype(np.int32)
     lndmrk_mask = cv2.fillConvexPoly(lndmrk_mask, hull, 1)
+
+    if dilation_percentage > 0:
+        rects = faces['rects'][0].cpu().numpy()
+        fileter_size_w = int((rects[2]-rects[0]) * dilation_percentage/100)
+        fileter_size_h = int((rects[3]-rects[1]) * dilation_percentage/100)
+        if fileter_size_w > 1 and fileter_size_h > 1:
+            kernel = np.ones((fileter_size_h, fileter_size_w), np.uint8)
+            lndmrk_mask = cv2.dilate(lndmrk_mask, kernel, iterations=3)
+            lndmrk_mask = lndmrk_mask[..., np.newaxis]
+
     lndmrk_mask = (lndmrk_mask==1)
 
     seg_mask_list = []
@@ -216,13 +226,13 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
             if target_included_parts:
                 lndmrk_masks = make_lndmrk_masks_from_parts(
                     faces, target_included_parts, image, 
-                    dilation_size=face_dilation_percentage
+                    dilation_percentage=face_dilation_percentage
                 )
                 included_masks.append(lndmrk_masks)
             if target_excluded_parts:
                 lndmrk_masks = make_lndmrk_masks_from_parts(
                     faces, target_excluded_parts, image, 
-                    dilation_size=face_dilation_percentage
+                    dilation_percentage=face_dilation_percentage
                 )
                 excluded_masks.append(lndmrk_masks)
 
