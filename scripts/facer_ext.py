@@ -88,10 +88,19 @@ seg_label_dict = {
     'Hair': 'hair',
     'Neck': 'neck',
     'Clothes': 'cloth',
+
+    'rb'     : 'rb',
+    'lb'     : 'lb',
+    're'     : 're',
+    'le'     : 'le',
+    'nose'   : 'nose',
+    'ulip'   : 'ulip',
+    'imouth' : 'imouth',
+    'llip'   : 'llip', 
 }
 
 def make_seg_masks_from_parts(faces, target_parts):
-    if 'face' in target_parts:
+    if 'Face' in target_parts:
         target_parts += [
             'rb', 'lb', 're', 'le', 'nose', 'ulip', 'imouth', 'llip'
         ]
