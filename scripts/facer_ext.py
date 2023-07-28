@@ -91,6 +91,11 @@ seg_label_dict = {
 }
 
 def make_seg_masks_from_parts(faces, target_parts):
+    if 'face' in target_parts:
+        target_parts += [
+            'rb', 'lb', 're', 'le', 'nose', 'ulip', 'imouth', 'llip'
+        ]
+
     seg_label_names = faces['seg']['label_names']
     seg_label_idx_dict = {label:i for i, label in enumerate(seg_label_names)}
     valid_label_list = [seg_label_dict.get(each_part, None) for each_part in target_parts]
