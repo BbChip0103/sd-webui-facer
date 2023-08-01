@@ -16,6 +16,7 @@ from io import BytesIO
 from fastapi import FastAPI
 from fastapi.exceptions import HTTPException
 from modules import devices, lowvram, script_callbacks, shared
+from modules.api import api
 from typing import Optional, Set
 from pydantic import BaseModel
 
@@ -283,12 +284,19 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
     return merged_mask
 
 
-def stringToRGB(base64_string):
+def base64_to_RGB(base64_string):
     imgdata = base64.b64decode(str(base64_string))
     img = Image.open(io.BytesIO(imgdata))
     opencv_img = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
     return opencv_img 
 
+def encode_np_to_base64(img):
+    pil = Image.fromarray(img)
+    return api.encode_pil_to_base64(pil)
+
+def RGB_to_base64(img):
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    return encode_np_to_base64(img) 
 
 def mount_facer_api(_: gr.Blocks, app: FastAPI):
     @app.get(
@@ -325,7 +333,7 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
         - **exclude_parts (Optional)**: Parts you need to exclude.
         - **dilate_percent (Optional)**: If you use face part, you can apply face part's dilation.
         """
-        img = stringToRGB(item.img)
+        img = base64_to_RGB(item.img)
         
         print()
         print('--- check ---')
@@ -340,6 +348,7 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
             excluded_parts=item.exclude_parts, 
             face_dilation_percentage=item.dilate_percent
         )
+        merged_mask = RGB_to_base64(merged_mask)
 
         result_dict= {
             'blended_image': img, 
