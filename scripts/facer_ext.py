@@ -24,6 +24,7 @@ seg_model = None
 seg_model_2 = None
 lndmrk_model = None
 
+part_label_list = ['Hair', 'Face', 'Neck', 'Clothes']
 
 def get_modelnames(type_='detection'):
     if type_.lower()=='detection':
@@ -137,7 +138,7 @@ def make_lndmrk_masks_from_parts(faces, target_parts, image, dilation_percentage
         fileter_size_h = int((rects[3]-rects[1]) * dilation_percentage/100)
         if fileter_size_w > 1 and fileter_size_h > 1:
             kernel = np.ones((fileter_size_h, fileter_size_w), np.uint8)
-            lndmrk_mask = cv2.dilate(lndmrk_mask, kernel, iterations=3)
+            lndmrk_mask = cv2.dilate(lndmrk_mask, kernel, iterations=1)
             lndmrk_mask = lndmrk_mask[..., np.newaxis]
 
     lndmrk_mask = (lndmrk_mask==1)
@@ -277,6 +278,10 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
     async def get_models(type_):
         return get_modelnames(type_)
 
+    @app.get("/facer/labels")
+    async def get_labels():
+        return part_label_list
+
 
 def add_tab():
     device = devices.get_optimal_device()
@@ -297,10 +302,10 @@ def single_tab():
             image = gr.Image(type='numpy', label="Image")
         with gr.Column():
             mask = gr.Image(type='numpy', label="Mask")
-            label_results = gr.Textbox(label="label results", lines=3)
+            # label_results = gr.Textbox(label="label results", lines=3)
     with gr.Row():
-        included_parts = gr.CheckboxGroup(['Hair', 'Face', 'Neck', 'Clothes'], label="Included parts")
-        excluded_parts = gr.CheckboxGroup(['Hair', 'Face', 'Neck', 'Clothes'], label='Excluded parts')
+        included_parts = gr.CheckboxGroup(part_label_list, label="Included parts")
+        excluded_parts = gr.CheckboxGroup(part_label_list, label='Excluded parts')
         face_dilation_percentage = gr.Slider(0, 100, value=0, label="Face dilation size (%)", info="If you check 'Face', you can choose dilation size")
     with gr.Row():
         button = gr.Button("Generate", variant='primary')
