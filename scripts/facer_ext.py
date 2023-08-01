@@ -286,7 +286,7 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
     @app.get(
         "/facer/labels",
         summary="Get segmentation part strs",
-        description="Valid part string for /facer/img2mask",
+        description="Valid part strings for /facer/img2mask",
     )
     async def get_labels():
         return part_label_list
@@ -299,7 +299,6 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
 
     @app.get(
         "/facer/img2mask",
-        response_model=Img2MaskItem,
         summary="Get segmentation mask",
         description="Get segmentation mask from portrait image",
     )
