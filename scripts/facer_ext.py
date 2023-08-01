@@ -332,9 +332,10 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
             excluded_parts=item.exclude_parts, 
             face_dilation_percentage=item.dilate_percent
         )
-        merged_mask = (merged_mask == 255)
+        
+        merged_mask_temp = (merged_mask == 255)
         masked_image = img.copy()
-        masked_image[~merged_mask] = 0 
+        masked_image[~merged_mask_temp] = 0 
 
         result_dict= {
             'blended_image': item.img, 
