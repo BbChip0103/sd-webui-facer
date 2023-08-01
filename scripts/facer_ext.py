@@ -274,6 +274,13 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
     return merged_mask
 
 
+def stringToRGB(base64_string):
+    imgdata = base64.b64decode(str(base64_string))
+    img = Image.open(io.BytesIO(imgdata))
+    opencv_img = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+return opencv_img 
+
+
 def mount_facer_api(_: gr.Blocks, app: FastAPI):
     @app.get(
         "/facer/models",
@@ -309,12 +316,26 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
         - **exclude_parts (Optional)**: Parts you need to exclude.
         - **dilate_percent (Optional)**: If you use face part, you can apply face part's dilation.
         """
-        img = item.img
+        img = stringToRGB(item.img)
+        
+        print()
+        print('--- check ---')
+        print(type(img))
+        print(img.shape, img.min(), img.max(), img.dtype)
+        print('--- check ---')
+        print()
+        
+        merged_mask = image_to_mask(
+            image=img, 
+            included_parts=item.include_parts, 
+            excluded_parts=item.exclude_parts, 
+            face_dilation_percentage=item.dilate_percent
+        )
 
         result_dict= {
             'blended_image': img, 
             'masked_image':img, 
-            'mask': img
+            'mask': merged_mask
         }
 
         return result_dict
