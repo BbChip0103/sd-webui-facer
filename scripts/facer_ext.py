@@ -351,8 +351,8 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
         merged_mask = RGB_to_base64(merged_mask)
 
         result_dict= {
-            'blended_image': img, 
-            'masked_image':img, 
+            'blended_image': item.img, 
+            'masked_image':item.img, 
             'mask': merged_mask
         }
 
