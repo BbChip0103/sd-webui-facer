@@ -314,7 +314,7 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
         result_dict= {
             'blended_image': img, 
             'masked_image':img, 
-            'mask': img
+            'mask_img': img
         }
 
         return result_dict
