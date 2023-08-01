@@ -294,7 +294,7 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
     class Img2MaskItem(BaseModel):
         img: str
         include_parts: list[str]
-        exclude_parts: Optional[list] = []
+        exclude_parts: Optional[list[str]] = []
         dilate_percent: Optional[int] = 0
 
     @app.get(
