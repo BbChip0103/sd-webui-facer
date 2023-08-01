@@ -297,7 +297,7 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
         exclude_parts: Optional[list[str]] = []
         dilate_percent: Optional[int] = 0
 
-    @app.get(
+    @app.post(
         "/facer/img2mask",
         summary="Get segmentation mask",
         description="Get segmentation mask from portrait image",
@@ -309,8 +309,15 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
         - **exclude_parts (Optional)**: Parts you need to exclude.
         - **dilate_percent (Optional)**: If you use face part, you can apply face part's dilation.
         """
+        img = item.img
 
-        return part_label_list
+        result_dict= {
+            'blended_image': img, 
+            'masked_image':img, 
+            'mask': img
+        }
+
+        return result_dict
 
 
 def add_tab():
