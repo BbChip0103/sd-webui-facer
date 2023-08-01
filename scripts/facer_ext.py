@@ -150,6 +150,15 @@ def make_lndmrk_masks_from_parts(faces, target_parts, image, dilation_percentage
     return seg_mask_list
 
 def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentage=0):
+    img = image.copy()
+    print()
+    print('--- check ---')
+    print(type(img))
+    print(img.shape, img.min(), img.max(), img.dtype)
+    print('--- check ---')
+    print()
+    
+    
     if included_parts:
         global det_model
         load_model('detection', 'retinaface/resnet50')
