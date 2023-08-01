@@ -151,15 +151,6 @@ def make_lndmrk_masks_from_parts(faces, target_parts, image, dilation_percentage
     return seg_mask_list
 
 def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentage=0):
-    img = image.copy()
-    print()
-    print('--- check ---')
-    print(type(img))
-    print(img.shape, img.min(), img.max(), img.dtype)
-    print('--- check ---')
-    print()
-    
-    
     if included_parts:
         global det_model
         load_model('detection', 'retinaface/resnet50')
@@ -334,26 +325,21 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
         - **dilate_percent (Optional)**: If you use face part, you can apply face part's dilation.
         """
         img = base64_to_RGB(item.img)
-        
-        print()
-        print('--- check ---')
-        print(type(img))
-        print(img.shape, img.min(), img.max(), img.dtype)
-        print('--- check ---')
-        print()
-        
+
         merged_mask = image_to_mask(
             image=img, 
             included_parts=item.include_parts, 
             excluded_parts=item.exclude_parts, 
             face_dilation_percentage=item.dilate_percent
         )
-        merged_mask = RGB_to_base64(merged_mask)
+        merged_mask = (merged_mask == 255)
+        masked_image = img.copy()
+        masked_image[~merged_mask] = 0 
 
         result_dict= {
             'blended_image': item.img, 
-            'masked_image':item.img, 
-            'mask': merged_mask
+            'masked_image': RGB_to_base64(masked_image), 
+            'mask': RGB_to_base64(merged_mask)
         }
 
         return result_dict
