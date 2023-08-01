@@ -16,8 +16,9 @@ from io import BytesIO
 from fastapi import FastAPI
 from fastapi.exceptions import HTTPException
 from modules import devices, lowvram, script_callbacks, shared
+from typing import Optional, Set
+from pydantic import BaseModel
 
-# from pydantic import BaseModel, Field
 
 det_model = None
 seg_model = None
@@ -273,22 +274,6 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
     return merged_mask
 
 
-from typing import Optional, Set
-
-from fastapi import FastAPI
-from pydantic import BaseModel
-
-app = FastAPI()
-
-
-class Item(BaseModel):
-    name: str
-    description: Optional[str] = None
-    price: float
-    tax: Optional[float] = None
-    tags: Set[str] = []
-
-
 def mount_facer_api(_: gr.Blocks, app: FastAPI):
     @app.get(
         "/facer/models",
@@ -304,6 +289,28 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
         description="Valid part string for /facer/img2mask",
     )
     async def get_labels():
+        return part_label_list
+
+    class Img2MaskItem(BaseModel):
+        img: str
+        include_parts: list[str]
+        exclude_parts: Optional[list] = []
+        dilate_percent: Optional[int] = 0
+
+    @app.get(
+        "/facer/img2mask",
+        response_model=Img2MaskItem,
+        summary="Get segmentation mask",
+        description="Get segmentation mask from portrait image",
+    )
+    async def img2mask(item:Img2MaskItem):
+        """
+        - **img**: A portrait image to generate binary mask.
+        - **include_parts**: Parts you need to include.
+        - **exclude_parts (Optional)**: Parts you need to exclude.
+        - **dilate_percent (Optional)**: If you use face part, you can apply face part's dilation.
+        """
+
         return part_label_list
 
 
