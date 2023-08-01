@@ -280,7 +280,7 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
         summary="Get model type strs",
         description="Currnetly we support 'detection', 'segmentation', 'landmark'",
     )
-    async def get_models(type_):
+    async def get_models():
         return ['detection', 'segmentation', 'landmark']
 
     @app.get(
