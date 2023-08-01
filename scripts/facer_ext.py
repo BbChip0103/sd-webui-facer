@@ -273,12 +273,36 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
     return merged_mask
 
 
-def mount_facer_api(_: gr.Blocks, app: FastAPI):
-    @app.get("/facer/models")
-    async def get_models(type_):
-        return get_modelnames(type_)
+from typing import Optional, Set
 
-    @app.get("/facer/labels")
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class Item(BaseModel):
+    name: str
+    description: Optional[str] = None
+    price: float
+    tax: Optional[float] = None
+    tags: Set[str] = []
+
+
+def mount_facer_api(_: gr.Blocks, app: FastAPI):
+    @app.get(
+        "/facer/models",
+        summary="Get model type strs",
+        description="Currnetly we support 'detection', 'segmentation', 'landmark'",
+    )
+    async def get_models(type_):
+        return ['detection', 'segmentation', 'landmark']
+
+    @app.get(
+        "/facer/labels",
+        summary="Get segmentation part strs",
+        description="Valid part string for /facer/img2mask",
+    )
     async def get_labels():
         return part_label_list
 
