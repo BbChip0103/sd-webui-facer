@@ -169,12 +169,12 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
         global lndmrk_model
         load_model('landmark', 'farl/wflw/448')
 
+    original_input_image = image.copy()
+
     included_masks = []
     excluded_masks = []
     with torch.inference_mode():
         device = devices.get_optimal_device()
-
-        original_input_image = image.copy()
 
         image = facer.hwc2bchw(
             torch.from_numpy(image)
@@ -275,7 +275,7 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
     masked_image = None
     if merged_mask is not None:
         merged_mask_temp = (merged_mask == 255)
-        masked_image = img.copy()
+        masked_image = original_input_image.copy()
         masked_image[~merged_mask_temp] = 0 
 
     return masked_image, merged_mask
