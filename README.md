@@ -21,13 +21,12 @@ It may be useful when you make image by stable diffusion.
 
 
 
-<!-- ## API
+## API
 
-The Facer exposes a simple API to interact with the extension which is 
-documented on the /docs page under /facer/* (using --api flag when starting the Web UI)
+We also provide a simple API to interact with the extension which is documented on the /docs page under /facer/* (using --api flag when starting the Web UI)
 * /facer/models
-  * lists all available models for facer
-* /facer/get-landmarks-mask
-  * returns a segmentation mask for the given image, model and mode
-* /facer/get-segmenattion-mask
-  * returns a segmentation mask for the given image, model and mode -->
+  * lists all available case (Currnetly 'detection', 'segmentation', 'landmark' are supported)
+* /facer/labels
+  * returns a valid part strings for /facer/img2mask
+* /facer/img2mask
+  * returns a segmentation mask for the given image (please check parameter details)
