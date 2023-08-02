@@ -150,7 +150,7 @@ def make_lndmrk_masks_from_parts(faces, target_parts, image, dilation_percentage
 
     return seg_mask_list
 
-def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentage=0):
+def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentage=0, type_='pil'):
     if included_parts:
         global det_model
         load_model('detection', 'retinaface/resnet50')
@@ -278,7 +278,11 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
         masked_image = original_input_image.copy()
         masked_image[~merged_mask_temp] = 0 
 
-    return masked_image, merged_mask
+    # if type_=='pil' and merged_mask is not None:
+    #     merged_mask = Image.fromarray(img)
+    #     merged_mask = Image.fromarray(img)
+
+    return [masked_image, merged_mask]
 
 
 def base64_to_RGB(base64_string):
@@ -336,12 +340,9 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
             image=img, 
             included_parts=item.include_parts, 
             excluded_parts=item.exclude_parts, 
-            face_dilation_percentage=item.dilate_percent
+            face_dilation_percentage=item.dilate_percent,
+            type_='numpy'
         )
-
-        merged_mask_temp = (merged_mask == 255)
-        masked_image = img.copy()
-        masked_image[~merged_mask_temp] = 0 
 
         result_dict= {
             'blended_image': item.img, 
