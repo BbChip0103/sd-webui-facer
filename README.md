@@ -7,7 +7,7 @@ This repository support making mask using facer module. </br>
 It may be useful when you make image by stable diffusion.
 
 
-![facer tab screenshot](https://github.com/BbChip0103/sd-webui-facer/raw/main/images/facer_tab.jpg)
+![facer tab screenshot](https://github.com/BbChip0103/sd-webui-facer/raw/main/images/facer_tab.png)
 
 
 ## Installing
