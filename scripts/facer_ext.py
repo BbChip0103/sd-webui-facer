@@ -278,9 +278,9 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
         masked_image = original_input_image.copy()
         masked_image[~merged_mask_temp] = 0 
 
-    # if type_=='pil' and merged_mask is not None:
-    #     merged_mask = Image.fromarray(img)
-    #     merged_mask = Image.fromarray(img)
+    if type_=='pil' and merged_mask is not None:
+        merged_mask = Image.fromarray(merged_mask)
+        masked_image = Image.fromarray(masked_image)
 
     return [masked_image, merged_mask]
 
