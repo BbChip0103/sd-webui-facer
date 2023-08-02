@@ -239,40 +239,46 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
                 )
                 excluded_masks.append(lndmrk_masks)
 
-        merged_mask = None
-        if included_masks and excluded_masks:
-            included_masks = np.vstack(included_masks)
-            excluded_masks = np.vstack(excluded_masks)
+    merged_mask = None
+    if included_masks and excluded_masks:
+        included_masks = np.vstack(included_masks)
+        excluded_masks = np.vstack(excluded_masks)
 
-            merged_included_mask = included_masks[0]
-            for each_mask in included_masks[1:]:
-                merged_included_mask = (merged_included_mask | each_mask)
+        merged_included_mask = included_masks[0]
+        for each_mask in included_masks[1:]:
+            merged_included_mask = (merged_included_mask | each_mask)
 
-            merged_excluded_mask = excluded_masks[0]
-            for each_mask in excluded_masks[1:]:
-                merged_excluded_mask = (merged_excluded_mask | each_mask)
+        merged_excluded_mask = excluded_masks[0]
+        for each_mask in excluded_masks[1:]:
+            merged_excluded_mask = (merged_excluded_mask | each_mask)
 
-            merged_mask = (merged_included_mask & (~merged_excluded_mask))
+        merged_mask = (merged_included_mask & (~merged_excluded_mask))
 
-        elif included_masks:
-            included_masks = np.vstack(included_masks)
+    elif included_masks:
+        included_masks = np.vstack(included_masks)
 
-            merged_included_mask = included_masks[0]
-            for each_mask in included_masks[1:]:
-                merged_included_mask = (merged_included_mask | each_mask)
+        merged_included_mask = included_masks[0]
+        for each_mask in included_masks[1:]:
+            merged_included_mask = (merged_included_mask | each_mask)
 
-            merged_mask = merged_included_mask
+        merged_mask = merged_included_mask
 
-        if merged_mask is not None:
-            merged_mask = merged_mask.astype(np.uint8)
-            merged_mask *= 255
+    if merged_mask is not None:
+        merged_mask = merged_mask.astype(np.uint8)
+        merged_mask *= 255
 
-            merged_mask = np.tile(
-                merged_mask, 
-                reps=3
-            )
+        merged_mask = np.tile(
+            merged_mask, 
+            reps=3
+        )
 
-    return merged_mask
+    masked_image = None
+    if merged_mask is not None:
+        merged_mask_temp = (merged_mask == 255)
+        masked_image = img.copy()
+        masked_image[~merged_mask_temp] = 0 
+
+    return masked_image, merged_mask
 
 
 def base64_to_RGB(base64_string):
@@ -326,13 +332,13 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
         """
         img = base64_to_RGB(item.img)
 
-        merged_mask = image_to_mask(
+        masked_image, merged_mask = image_to_mask(
             image=img, 
             included_parts=item.include_parts, 
             excluded_parts=item.exclude_parts, 
             face_dilation_percentage=item.dilate_percent
         )
-        
+
         merged_mask_temp = (merged_mask == 255)
         masked_image = img.copy()
         masked_image[~merged_mask_temp] = 0 
@@ -364,7 +370,8 @@ def single_tab():
         with gr.Column():
             image = gr.Image(type='numpy', label="Image")
         with gr.Column():
-            mask = gr.Image(type='numpy', label="Mask")
+            # mask = gr.Image(type='numpy', label="Mask")
+            results = gr.Gallery(label="Results").style(grid=2)
             # label_results = gr.Textbox(label="label results", lines=3)
     with gr.Row():
         included_parts = gr.CheckboxGroup(part_label_list, label="Included parts")
@@ -373,7 +380,7 @@ def single_tab():
     with gr.Row():
         button = gr.Button("Generate", variant='primary')
         unload_button = gr.Button("Model unload")
-    button.click(image_to_mask, inputs=[image, included_parts, excluded_parts, face_dilation_percentage], outputs=mask)
+    button.click(image_to_mask, inputs=[image, included_parts, excluded_parts, face_dilation_percentage], outputs=results)
     unload_button.click(unload_model)
 
 
