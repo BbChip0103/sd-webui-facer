@@ -151,8 +151,6 @@ def make_lndmrk_masks_from_parts(faces, target_parts, image, dilation_percentage
     return seg_mask_list
 
 def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentage=0, type_='pil'):
-    print("@@@hello image_to_mask@@@")
-
     if included_parts:
         global det_model
         load_model('detection', 'retinaface/resnet50')
@@ -195,7 +193,6 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
         if target_included_parts + target_excluded_parts:
             faces = seg_model(image, faces)
             if target_included_parts:
-                # 1. 여기서 받음
                 seg_masks = make_seg_masks_from_parts(faces, target_included_parts)
                 included_masks.append(seg_masks)
             if target_excluded_parts:
@@ -230,7 +227,6 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
         if target_included_parts + target_excluded_parts:
             faces = lndmrk_model(image, faces)
             if target_included_parts:
-                # 3. 여기서 받음
                 lndmrk_masks = make_lndmrk_masks_from_parts(
                     faces, target_included_parts, image, 
                     dilation_percentage=face_dilation_percentage
