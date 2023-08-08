@@ -241,6 +241,16 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
 
     merged_mask = None
     if included_masks and excluded_masks:
+        for i, included_masks_line in enumerate(included_masks):
+            if np.array(included_masks_line).ndim > 4:
+                # make dim to 4
+                included_masks[i] = np.vstack(included_masks_line)
+
+        for i, excluded_masks_line in enumerate(excluded_masks):
+            if np.array(excluded_masks_line).ndim > 4:
+                # make dim to 4
+                excluded_masks[i] = np.vstack(excluded_masks_line)
+
         included_masks = np.vstack(included_masks)
         excluded_masks = np.vstack(excluded_masks)
 
@@ -255,6 +265,11 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
         merged_mask = (merged_included_mask & (~merged_excluded_mask))
 
     elif included_masks:
+        for i, included_masks_line in enumerate(included_masks):
+            if np.array(included_masks_line).ndim > 4:
+                # make dim to 4
+                included_masks[i] = np.vstack(included_masks_line)
+
         included_masks = np.vstack(included_masks)
 
         merged_included_mask = included_masks[0]
