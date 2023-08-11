@@ -150,7 +150,7 @@ def make_lndmrk_masks_from_parts(faces, target_parts, image, dilation_percentage
 
     return seg_mask_list
 
-def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentage=0, type_='pil'):
+def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentage=0, want_one_big_face=False, type_='pil'):
     if included_parts:
         global det_model
         load_model('detection', 'retinaface/resnet50')
@@ -239,24 +239,40 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
                 )
                 excluded_masks.append(lndmrk_masks)
 
-    merged_mask = None
-    if included_masks and excluded_masks:
+    # make dim to 5
+    if included_masks:
         for i, included_masks_line in enumerate(included_masks):
             if np.array(included_masks_line).ndim > 4:
                 # make dim to 4
                 included_masks[i] = np.vstack(included_masks_line)
 
+    if excluded_masks:
         for i, excluded_masks_line in enumerate(excluded_masks):
             if np.array(excluded_masks_line).ndim > 4:
                 # make dim to 4
                 excluded_masks[i] = np.vstack(excluded_masks_line)
 
+    # make merged_mask
+    merged_mask = None
+    if included_masks and excluded_masks:
         included_masks = np.vstack(included_masks)
         excluded_masks = np.vstack(excluded_masks)
 
-        merged_included_mask = included_masks[0]
-        for each_mask in included_masks[1:]:
-            merged_included_mask = (merged_included_mask | each_mask)
+        if want_one_big_face:
+            included_masks_sum = [np.sum(np.array(line)) for line in included_masks]
+            max_size_idx = included_masks_sum.index(max(included_masks_sum))
+            merged_included_mask = included_masks[max_size_idx]
+            for i, each_mask in reversed(list(enumerate(included_masks))):
+                if i == max_size_idx:
+                    continue
+                tmp_merged_mask = (merged_included_mask & each_mask)
+                tmp_merged_mask_sum = np.sum(np.array(tmp_merged_mask))
+                if tmp_merged_mask_sum:
+                    merged_included_mask = (merged_included_mask | each_mask)
+        else:
+            merged_included_mask = included_masks[0]
+            for each_mask in included_masks[1:]:
+                merged_included_mask = (merged_included_mask | each_mask)
 
         merged_excluded_mask = excluded_masks[0]
         for each_mask in excluded_masks[1:]:
@@ -265,19 +281,27 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
         merged_mask = (merged_included_mask & (~merged_excluded_mask))
 
     elif included_masks:
-        for i, included_masks_line in enumerate(included_masks):
-            if np.array(included_masks_line).ndim > 4:
-                # make dim to 4
-                included_masks[i] = np.vstack(included_masks_line)
-
         included_masks = np.vstack(included_masks)
 
-        merged_included_mask = included_masks[0]
-        for each_mask in included_masks[1:]:
-            merged_included_mask = (merged_included_mask | each_mask)
+        if want_one_big_face:
+            included_masks_sum = [np.sum(np.array(line)) for line in included_masks]
+            max_size_idx = included_masks_sum.index(max(included_masks_sum))
+            merged_included_mask = included_masks[max_size_idx]
+            for i, each_mask in reversed(list(enumerate(included_masks))):
+                if i == max_size_idx:
+                    continue
+                tmp_merged_mask = (merged_included_mask & each_mask)
+                tmp_merged_mask_sum = np.sum(np.array(tmp_merged_mask))
+                if tmp_merged_mask_sum:
+                    merged_included_mask = (merged_included_mask | each_mask)
+        else:
+            merged_included_mask = included_masks[0]
+            for each_mask in included_masks[1:]:
+                merged_included_mask = (merged_included_mask | each_mask)
 
         merged_mask = merged_included_mask
 
+    # process merged_mask
     if merged_mask is not None:
         merged_mask = merged_mask.astype(np.uint8)
         merged_mask *= 255
@@ -336,6 +360,7 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
         include_parts: list[str]
         exclude_parts: Optional[list[str]] = []
         dilate_percent: Optional[int] = 0
+        want_one_big_face: bool = False
 
     @app.post(
         "/facer/img2mask",
@@ -356,7 +381,8 @@ def mount_facer_api(_: gr.Blocks, app: FastAPI):
             included_parts=item.include_parts, 
             excluded_parts=item.exclude_parts, 
             face_dilation_percentage=item.dilate_percent,
-            type_='numpy'
+            type_='numpy',
+            want_one_big_face=item.want_one_big_face
         )
 
         result_dict= {
@@ -393,10 +419,11 @@ def single_tab():
         included_parts = gr.CheckboxGroup(part_label_list, label="Included parts")
         excluded_parts = gr.CheckboxGroup(part_label_list, label='Excluded parts')
         face_dilation_percentage = gr.Slider(0, 100, value=0, label="Face dilation size (%)", info="If you check 'Face', you can choose dilation size")
+        want_one_big_face = gr.Checkbox(label="want one big face", info="If you check it, you will get the biggest face")
     with gr.Row():
         button = gr.Button("Generate", variant='primary')
         unload_button = gr.Button("Model unload")
-    button.click(image_to_mask, inputs=[image, included_parts, excluded_parts, face_dilation_percentage], outputs=results)
+    button.click(image_to_mask, inputs=[image, included_parts, excluded_parts, face_dilation_percentage, want_one_big_face], outputs=results)
     unload_button.click(unload_model)
 
 
