@@ -181,63 +181,63 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
         ).to(device=device)
 
         faces = det_model(image)
+        if faces:
+            target_included_parts = [
+                each_part for each_part in ['Hair', 'Face']
+                    if each_part in included_parts
+            ]
+            target_excluded_parts = [
+                each_part for each_part in ['Hair', 'Face']
+                    if each_part in excluded_parts
+            ]
+            if target_included_parts + target_excluded_parts:
+                faces = seg_model(image, faces)
+                if target_included_parts:
+                    seg_masks = make_seg_masks_from_parts(faces, target_included_parts)
+                    included_masks.append(seg_masks)
+                if target_excluded_parts:
+                    seg_masks = make_seg_masks_from_parts(faces, target_excluded_parts)
+                    excluded_masks.append(seg_masks)
+            
+            target_included_parts = [
+                each_part for each_part in ['Neck', 'Clothes']
+                    if each_part in included_parts
+            ]
+            target_excluded_parts = [
+                each_part for each_part in ['Neck', 'Clothes']
+                    if each_part in excluded_parts
+            ]
+            if target_included_parts + target_excluded_parts:
+                faces = seg_model_2(image, faces)
+                if target_included_parts:
+                    seg_masks = make_seg_masks_from_parts(faces, target_included_parts)
+                    included_masks.append(seg_masks)
+                if target_excluded_parts:
+                    seg_masks = make_seg_masks_from_parts(faces, target_excluded_parts)
+                    excluded_masks.append(seg_masks)
 
-        target_included_parts = [
-            each_part for each_part in ['Hair', 'Face']
-                if each_part in included_parts
-        ]
-        target_excluded_parts = [
-            each_part for each_part in ['Hair', 'Face']
-                if each_part in excluded_parts
-        ]
-        if target_included_parts + target_excluded_parts:
-            faces = seg_model(image, faces)
-            if target_included_parts:
-                seg_masks = make_seg_masks_from_parts(faces, target_included_parts)
-                included_masks.append(seg_masks)
-            if target_excluded_parts:
-                seg_masks = make_seg_masks_from_parts(faces, target_excluded_parts)
-                excluded_masks.append(seg_masks)
-        
-        target_included_parts = [
-            each_part for each_part in ['Neck', 'Clothes']
-                if each_part in included_parts
-        ]
-        target_excluded_parts = [
-            each_part for each_part in ['Neck', 'Clothes']
-                if each_part in excluded_parts
-        ]
-        if target_included_parts + target_excluded_parts:
-            faces = seg_model_2(image, faces)
-            if target_included_parts:
-                seg_masks = make_seg_masks_from_parts(faces, target_included_parts)
-                included_masks.append(seg_masks)
-            if target_excluded_parts:
-                seg_masks = make_seg_masks_from_parts(faces, target_excluded_parts)
-                excluded_masks.append(seg_masks)
-
-        target_included_parts = [
-            each_part for each_part in ['Face']
-                if each_part in included_parts
-        ]
-        target_excluded_parts = [
-            each_part for each_part in ['Face']
-                if each_part in excluded_parts
-        ]
-        if target_included_parts + target_excluded_parts:
-            faces = lndmrk_model(image, faces)
-            if target_included_parts:
-                lndmrk_masks = make_lndmrk_masks_from_parts(
-                    faces, target_included_parts, image, 
-                    dilation_percentage=face_dilation_percentage
-                )
-                included_masks.append(lndmrk_masks)
-            if target_excluded_parts:
-                lndmrk_masks = make_lndmrk_masks_from_parts(
-                    faces, target_excluded_parts, image, 
-                    dilation_percentage=face_dilation_percentage
-                )
-                excluded_masks.append(lndmrk_masks)
+            target_included_parts = [
+                each_part for each_part in ['Face']
+                    if each_part in included_parts
+            ]
+            target_excluded_parts = [
+                each_part for each_part in ['Face']
+                    if each_part in excluded_parts
+            ]
+            if target_included_parts + target_excluded_parts:
+                faces = lndmrk_model(image, faces)
+                if target_included_parts:
+                    lndmrk_masks = make_lndmrk_masks_from_parts(
+                        faces, target_included_parts, image, 
+                        dilation_percentage=face_dilation_percentage
+                    )
+                    included_masks.append(lndmrk_masks)
+                if target_excluded_parts:
+                    lndmrk_masks = make_lndmrk_masks_from_parts(
+                        faces, target_excluded_parts, image, 
+                        dilation_percentage=face_dilation_percentage
+                    )
+                    excluded_masks.append(lndmrk_masks)
 
     # make dim to 5
     if included_masks:
