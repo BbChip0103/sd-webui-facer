@@ -302,7 +302,8 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
         merged_mask = merged_included_mask
 
     # process merged_mask
-    if merged_mask:
+    masked_image = None
+    if merged_mask is not None:
         merged_mask = merged_mask.astype(np.uint8)
         merged_mask *= 255
 
@@ -311,8 +312,6 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
             reps=3
         )
 
-    masked_image = None
-    if merged_mask:
         merged_mask_temp = (merged_mask == 255)
         masked_image = original_input_image.copy()
         masked_image[~merged_mask_temp] = 0
@@ -320,7 +319,7 @@ def image_to_mask(image, included_parts, excluded_parts, face_dilation_percentag
         merged_mask = np.zeros_like(original_input_image)
         masked_image = np.zeros_like(original_input_image)
 
-    if type_=='pil' and merged_mask:
+    if type_=='pil':
         merged_mask = Image.fromarray(merged_mask)
         masked_image = Image.fromarray(masked_image)
 
